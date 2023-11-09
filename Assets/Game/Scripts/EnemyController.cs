@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 namespace MocopiAIGame
@@ -14,17 +15,18 @@ namespace MocopiAIGame
         
         private static readonly int ThrowAttackHash = Animator.StringToHash("ThrowAttack");
         private static readonly int JumpAttackHash = Animator.StringToHash("JumpAttack");
+        private static readonly int DamageHash = Animator.StringToHash("Damage");
 
         private void Start()
         {
             _animator = GetComponent<Animator>();
-            JumpAttack();
+            ThrowAnimation();
         }
 
         /// <summary>
         /// 炎を投げる攻撃
         /// </summary>
-        private void ThrowAttack()
+        private void ThrowAnimation()
         {
             _animator.SetTrigger(ThrowAttackHash);
         }
@@ -35,10 +37,28 @@ namespace MocopiAIGame
             Instantiate(fireBall, rightHandTransform.position, Quaternion.identity);
         }
         
-        private void JumpAttack()
+        private void JumpAnimation()
         {
             _animator.SetTrigger(JumpAttackHash);
-            
+        }
+
+        private void JumpMove()
+        {
+            //TODO: VRPlayerの位置を取得して、そこに向かってジャンプする
+
+            var jumpSequence = DOTween.Sequence(); //Sequence生成
+            //Tweenをつなげる
+            jumpSequence.Append(this.transform.DOMove(endValue:
+                            new Vector3(0f, 5.0f, 0), duration: 2.0f).SetEase(Ease.InOutQuad)
+                                .OnComplete(TimeManager.Instance.SlowDownTime)).SetLink(gameObject)
+                        .Append(this.transform.DOMove(endValue:
+                            new Vector3(0f, 0.0f, 0), duration: 1.0f).SetEase(Ease.InSine)
+                                .OnComplete(TimeManager.Instance.ResetTime)).SetLink(gameObject);
+        }
+
+        private void DamageAnimation()
+        {
+            _animator.SetTrigger(DamageHash);
         }
     }
 }
