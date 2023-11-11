@@ -31,6 +31,8 @@ namespace MocopiDistinction
         [SerializeField] private Transform LHandTransform = null;
         
         private List<float> _data = new();
+        float timer = 0.0f;
+        float interval = 0.1f;
 
         public InputJointAndGetResult(float[] results)
         {
@@ -55,20 +57,28 @@ namespace MocopiDistinction
             MocopiDistinctionAI.MotionData motionData = new MocopiDistinctionAI.MotionData();
             
             //UniRxを用いて0.1秒ごとに処理を行う
-            Observable.Interval(System.TimeSpan.FromSeconds(0.1f)).Subscribe(_ =>
-            {
-                //モーションデータを取得
-                motionData.data = GetMotionData();
-
-                if (motionData.data.Length < 2610)
+            Observable.EveryUpdate()
+                .Subscribe(_ =>
                 {
-                    Debug.Log("モーション取得中");
-                    return;
-                }
-                //AIにモーションデータを渡して結果を受け取る
-                results = mocopiDistinctionAI.RunAI(motionData);
-                
-            }).AddTo(this);
+                    timer += Time.deltaTime;
+                    if (timer >= interval)
+                    {
+                        // 0.1秒ごとの処理
+                        // モーションデータを取得
+                        motionData.data = GetMotionData();
+
+                        if (motionData.data.Length < 2610)
+                        {
+                            Debug.Log("モーション取得中");
+                            return;
+                        }
+                        // AIにモーションデータを渡して結果を受け取る
+                        results = mocopiDistinctionAI.RunAI(motionData);
+
+                        timer = 0.0f; // タイマーリセット
+                    }
+                })
+                .AddTo(this);
         }
 
         private float[] GetMotionData()

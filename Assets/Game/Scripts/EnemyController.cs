@@ -12,7 +12,7 @@ namespace MocopiAIGame
         private Animator _animator;
         [SerializeField] private GameObject fireBall;
         [SerializeField] private Transform rightHandTransform;
-        
+
         private static readonly int ThrowAttackHash = Animator.StringToHash("ThrowAttack");
         private static readonly int JumpAttackHash = Animator.StringToHash("JumpAttack");
         private static readonly int DamageHash = Animator.StringToHash("Damage");
@@ -34,7 +34,9 @@ namespace MocopiAIGame
         private void ThrowEffect()
         {
             Debug.Log("炎をなげる");
-            Instantiate(fireBall, rightHandTransform.position, Quaternion.identity);
+            GameObject fire = Instantiate(fireBall, rightHandTransform.position, Quaternion.identity);
+            FireBallAnimation fireBallAnimation = fire.GetComponent<FireBallAnimation>();
+            FirePool.Instance.fireBallAnimations.Add(fireBallAnimation);
         }
         
         private void JumpAnimation()

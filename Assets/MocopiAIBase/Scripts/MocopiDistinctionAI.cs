@@ -15,7 +15,7 @@ namespace MocopiDistinction
         private TensorFloat _inputTensor;
         private IWorker _engine;
         private TensorShape shape = new(1, 2610);
-        
+
         public class MotionData
         {
             public float[] data;

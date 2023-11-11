@@ -10,5 +10,6 @@ public class MotionText : MonoBehaviour
     public void SetText(string str)
     {
         text.text = str;
+        Debug.Log(str);
     }
 }
