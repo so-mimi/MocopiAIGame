@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 namespace MocopiAIGame
 {
@@ -12,19 +13,22 @@ namespace MocopiAIGame
         private Animator _animator;
         [SerializeField] private GameObject fireBall;
         [SerializeField] private Transform rightHandTransform;
+        private PKFire _pkFire;
         private PKThunder _pkThunder;
         public Sequence JumpTween;
-        private Player Player;
+        private Player _player;
 
         private static readonly int ThrowAttackHash = Animator.StringToHash("ThrowAttack");
         private static readonly int JumpAttackHash = Animator.StringToHash("JumpAttack");
         private static readonly int DamageHash = Animator.StringToHash("Damage");
-
+        private static readonly int StunHash = Animator.StringToHash("Stun");
+        
         private void Start()
         {
+            _pkFire = FindObjectOfType<PKFire>();
             _pkThunder = FindObjectOfType<PKThunder>();
             _animator = GetComponent<Animator>();
-            Player = FindObjectOfType<Player>();
+            _player = FindObjectOfType<Player>();
             JumpAnimation();
         }
 
@@ -81,12 +85,35 @@ namespace MocopiAIGame
             Debug.Log("サンダー攻撃");
             _pkThunder.OnPKThunder -= ThunderAttack;
             JumpTween.Kill();
-            Player.SpawnFreezeBall();
+            _player.SpawnFreezeBall();
         }
 
-        public void DamageAnimation()
+        public async UniTask DamageAnimation()
         {
             _animator.SetTrigger(DamageHash);
+            await UniTask.Delay(1000);
+            StunAnimation();
+        }
+        
+        public void StunAnimation()
+        {
+            _animator.SetTrigger(StunHash);
+            StunEvent();
+        }
+
+        public async UniTask StunEvent()
+        {
+            await UniTask.Delay(300);
+            SlowTime();
+            _pkFire.OnPKFire += PlayerFireAttack;
+            await UniTask.Delay(300);
+            _pkFire.OnPKFire -= PlayerFireAttack;
+            TimeManager.Instance.ResetTime();
+        }
+        
+        private void PlayerFireAttack()
+        {
+            _player.SpawnPlayerFire();
         }
 
         public void BackAnimation()
