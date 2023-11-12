@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using DG.Tweening;
+using MocopiAIGame;
 
 public class FireBallAnimation : MonoBehaviour
 {
@@ -9,10 +10,12 @@ public class FireBallAnimation : MonoBehaviour
     private Tween _tween;
     
     private Hit _hit;
+    private EnemyController _enemyController;
 
     private void OnEnable()
     {
         _hit = FindObjectOfType<Hit>();
+        _enemyController = FindObjectOfType<EnemyController>();
         _cameraTransform = Camera.main.transform;
         _tween = transform.DOMove(_cameraTransform.position + _cameraTransform.forward * 0.1f, 8f).OnStart(() =>
         {
@@ -40,6 +43,7 @@ public class FireBallAnimation : MonoBehaviour
         }).OnComplete(() =>
         {
             FirePool.Instance.fireBallAnimations.Remove(this);
+            _enemyController.DamageAnimation();
             gameObject.SetActive(false);
         });
     }

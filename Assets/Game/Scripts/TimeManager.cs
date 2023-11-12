@@ -12,7 +12,7 @@ public class TimeManager : MonoBehaviour
 
     public void SlowDownTime()
     {
-        Time.timeScale = 0.1f;
+        Time.timeScale = 0.3f;
     }
     
     public void ResetTime()

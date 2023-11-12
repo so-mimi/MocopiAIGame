@@ -165,6 +165,10 @@ PrefabInstance:
       propertyPath: m_TrackingStateInput.m_Action.m_Id
       value: b6d644b7-d35e-444d-aff8-ef475b3487b6
       objectReference: {fileID: 0}
+    - target: {fileID: 3127728407712097246, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+      propertyPath: m_TrackingStateInput.m_Action.m_Name
+      value: Tracking State Input
+      objectReference: {fileID: 0}
     - target: {fileID: 3415145736139425353, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -266,6 +270,14 @@ PrefabInstance:
     - {fileID: 3127728407712097242, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
     - {fileID: 3127728407712097243, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
     - {fileID: 3127728407712097240, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+    - {fileID: 4564216430282282028, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+    - {fileID: 9014170785475729497, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+    - {fileID: 3414492871629994245, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+    - {fileID: 8074195219289459696, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+    - {fileID: 3711799367079663623, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+    - {fileID: 9014170783705847993, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+    - {fileID: 5045211221932542186, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+    - {fileID: 2429146838225186546, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
 --- !u!4 &105290559 stripped
 Transform:
@@ -2097,6 +2109,24 @@ MonoBehaviour:
   - {fileID: 596669959}
   - {fileID: 1638742186}
   output: {fileID: 2077213671}
+--- !u!1 &2097025660 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7313654230448209575, guid: 895f6f3c2d334633b5800312285058d2, type: 3}
+  m_PrefabInstance: {fileID: 39665130}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2097025662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097025660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64ccce54c8bb297468c6b314b4d9bb19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  freezeBallPrefab: {fileID: 1920325297268671343, guid: e5c1781316d4b6144b6477f63cb65924, type: 3}
 --- !u!4 &2129038821 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1014036865226340429, guid: cccbbdb3cbdde464ba23dc13bf813538, type: 3}
