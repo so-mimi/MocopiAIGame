@@ -29,7 +29,25 @@ namespace MocopiAIGame
             _pkThunder = FindObjectOfType<PKThunder>();
             _animator = GetComponent<Animator>();
             _player = FindObjectOfType<Player>();
-            JumpAnimation();
+            SelectAttack(3f);
+        }
+        
+        /// <summary>
+        /// 敵の攻撃セレクト
+        /// </summary>
+        /// <param name="waitTimeSec"></param>
+        public async UniTask SelectAttack(float waitTimeSec)
+        {
+            await UniTask.Delay((int) (waitTimeSec * 1000));
+            int random = Random.Range(0, 2);
+            if (random == 0)
+            {
+                ThrowAnimation();
+            }
+            else
+            {
+                JumpAnimation();
+            }
         }
 
         /// <summary>
@@ -70,6 +88,7 @@ namespace MocopiAIGame
                     {
                         _pkThunder.OnPKThunder -= ThunderAttack;
                         TimeManager.Instance.ResetTime();
+                        SelectAttack(7f);
                     })).SetLink(gameObject)
                 .Append(this.transform.DOJump(
                     new Vector3(0f, 0f, 7f), jumpPower: 2f, numJumps: 1, duration: 2f));
@@ -109,6 +128,7 @@ namespace MocopiAIGame
             await UniTask.Delay(300);
             _pkFire.OnPKFire -= PlayerFireAttack;
             TimeManager.Instance.ResetTime();
+            SelectAttack(5f);
         }
         
         private void PlayerFireAttack()

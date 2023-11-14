@@ -51,7 +51,7 @@ public class GameOutput : MonoBehaviour
             }
             if (i == 1)
             {
-                results[i] *= 90f;
+                results[i] *= 92f;
             }
             if (i == 2)
             {

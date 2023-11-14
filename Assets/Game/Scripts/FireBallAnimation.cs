@@ -23,7 +23,9 @@ public class FireBallAnimation : MonoBehaviour
         }).OnComplete(() =>
         {
             TimeManager.Instance.ResetTime();
+            _enemyController.DamageAnimation();
             gameObject.SetActive(false);
+            
         });
     }
     
@@ -44,6 +46,7 @@ public class FireBallAnimation : MonoBehaviour
         {
             FirePool.Instance.fireBallAnimations.Remove(this);
             _enemyController.DamageAnimation();
+            _enemyController.SelectAttack(5f);
             gameObject.SetActive(false);
         });
     }
