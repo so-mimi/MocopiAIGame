@@ -17,7 +17,7 @@ public class FireBallAnimation : MonoBehaviour
         _hit = FindObjectOfType<Hit>();
         _enemyController = FindObjectOfType<EnemyController>();
         _cameraTransform = Camera.main.transform;
-        _tween = transform.DOMove(_cameraTransform.position + _cameraTransform.forward * 0.1f, 8f).OnStart(() =>
+        _tween = transform.DOMove(_cameraTransform.position + _cameraTransform.forward * 0.1f, 5f).OnStart(() =>
         {
             FireBallTime();
         }).OnComplete(() =>
@@ -28,10 +28,10 @@ public class FireBallAnimation : MonoBehaviour
 
     private async UniTask FireBallTime()
     {
-        await UniTask.Delay(4000);
+        await UniTask.Delay(2500);
         TimeManager.Instance.SlowDownTime();
         _hit.OnHit += Hit;
-        await UniTask.Delay(2000);
+        await UniTask.Delay(1500);
         _hit.OnHit -= Hit;
         if (TimeManager.Instance.isSlowDown)
         {
@@ -45,7 +45,7 @@ public class FireBallAnimation : MonoBehaviour
         if (_isHit) return;
         _isHit = true;
         _tween.Kill();
-        _tween = transform.DOMove(EnemyPosition.Instance.chestTransform.position, 0.4f).SetEase(Ease.InCubic).OnStart(() =>
+        _tween = transform.DOMove(EnemyPosition.Instance.chestTransform.position, 1f).SetEase(Ease.InCubic).OnStart(() =>
         {
             TimeManager.Instance.ResetTime();
         }).OnComplete(() =>

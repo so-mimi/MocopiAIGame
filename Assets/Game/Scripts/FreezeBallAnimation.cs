@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using MocopiAIGame;
 using UnityEngine;
 using DG.Tweening;
@@ -20,17 +17,12 @@ public class FreezeBallAnimation : MonoBehaviour
         this.transform.DOMove(EnemyPosition.Instance.chestTransform.position, 2f).SetEase(Ease.Linear).OnStart(() =>
         {
             enemyController.JumpTween.Kill();
-            Invoke("ResetTime", 1f);
+            TimeManager.Instance.ResetTime();
         }).OnComplete(() =>
         {
             enemyController.DamageAnimation();
             enemyController.BackAnimation();
             gameObject.SetActive(false);
         });
-    }
-
-    private void ResetTime()
-    {
-        TimeManager.Instance.ResetTime();
     }
 }

@@ -13,10 +13,13 @@ namespace MocopiAIGame
         private Animator _animator;
         [SerializeField] private GameObject fireBall;
         [SerializeField] private Transform rightHandTransform;
+        [SerializeField] private Material enemyMaterial;
+        [SerializeField] private GameObject fireImpactPrefab;
         private PKFire _pkFire;
         private PKThunder _pkThunder;
         public Sequence JumpTween;
         private Player _player;
+        private bool _isPKFire;
 
         private static readonly int ThrowAttackHash = Animator.StringToHash("ThrowAttack");
         private static readonly int JumpAttackHash = Animator.StringToHash("JumpAttack");
@@ -80,7 +83,8 @@ namespace MocopiAIGame
                     .OnComplete(() =>
                     {
                         _pkThunder.OnPKThunder += ThunderAttack;
-                        Invoke("SlowTime", 0.2f);
+                        UniTask.Delay(2000).Forget();
+                        TimeManager.Instance.SlowDownTime();
                     })).SetLink(gameObject)
                 .Append(this.transform.DOMove(endValue:
                         new Vector3(0f, 0.0f, 0), duration: 1.0f).SetEase(Ease.InSine)
@@ -92,11 +96,6 @@ namespace MocopiAIGame
                     })).SetLink(gameObject)
                 .Append(this.transform.DOJump(
                     new Vector3(0f, 0f, 7f), jumpPower: 2f, numJumps: 1, duration: 2f));
-        }
-        
-        private void SlowTime()
-        {
-            TimeManager.Instance.SlowDownTime();
         }
 
         private void ThunderAttack()
@@ -110,8 +109,19 @@ namespace MocopiAIGame
         public async UniTask DamageAnimation()
         {
             _animator.SetTrigger(DamageHash);
+            DamageEffect();
             await UniTask.Delay(1000);
             StunAnimation();
+        }
+
+        public void DamageEffect()
+        {
+            Instantiate(fireImpactPrefab, EnemyPosition.Instance.chestTransform.position, Quaternion.identity);
+            Sequence sequence = DOTween.Sequence();
+            sequence.Append(enemyMaterial.DOColor(Color.white, 0.1f))
+                .Append(enemyMaterial.DOColor(Color.black, 0.1f))
+                .Append(enemyMaterial.DOColor(Color.white, 0.1f))
+                .Append(enemyMaterial.DOColor(Color.black, 0.1f));
         }
         
         public void StunAnimation()
@@ -122,24 +132,35 @@ namespace MocopiAIGame
 
         public async UniTask StunEvent()
         {
+            _isPKFire = false;
             await UniTask.Delay(300);
-            SlowTime();
+            TimeManager.Instance.SlowDownTime();
             _pkFire.OnPKFire += PlayerFireAttack;
             await UniTask.Delay(300);
-            _pkFire.OnPKFire -= PlayerFireAttack;
-            TimeManager.Instance.ResetTime();
+            if (!_isPKFire)
+            {
+                _pkFire.OnPKFire -= PlayerFireAttack;
+                if (TimeManager.Instance.isSlowDown)
+                {
+                    TimeManager.Instance.ResetTime();
+                }
+            }
+            
             SelectAttack(5f);
         }
         
         private void PlayerFireAttack()
         {
+            _isPKFire = true;
+            _pkFire.OnPKFire -= PlayerFireAttack;
+            TimeManager.Instance.ResetTime();
             _player.SpawnPlayerFire();
         }
 
         public void BackAnimation()
         {
             this.transform.DOJump(
-                new Vector3(0f, 0f, 7f), jumpPower: 2f, numJumps: 1, duration: 2f);
+        new Vector3(0f, 0f, 7f), jumpPower: 2f, numJumps: 1, duration: 2f);
         }
     }
 }
