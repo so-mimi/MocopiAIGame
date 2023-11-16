@@ -11,10 +11,12 @@ public class FireBallAnimation : MonoBehaviour
     private Hit _hit;
     private EnemyController _enemyController;
     private bool _isHit = false;
+    private Player _player;
 
     private void OnEnable()
     {
         _hit = FindObjectOfType<Hit>();
+        _player = FindObjectOfType<Player>();
         _enemyController = FindObjectOfType<EnemyController>();
         _cameraTransform = Camera.main.transform;
         _tween = transform.DOMove(_cameraTransform.position + _cameraTransform.forward * 0.1f, 5f).OnStart(() =>
@@ -22,6 +24,8 @@ public class FireBallAnimation : MonoBehaviour
             FireBallTime();
         }).OnComplete(() =>
         {
+            _player.PlayerDamageEffect();
+            _enemyController.SelectAttack(5f);
             gameObject.SetActive(false);
         });
     }

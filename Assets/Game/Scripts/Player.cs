@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private GameObject freezeBallPrefab = null;
     [SerializeField] private GameObject pkFireBallPrefab = null;
+    [SerializeField] private ViewOfDamage viewOfDamage;
     private Transform cameraTransform = null;
     
     
@@ -25,5 +26,10 @@ public class Player : MonoBehaviour
     {
         Debug.Log("PlayerFire");
         GameObject pkFireBall = Instantiate(pkFireBallPrefab, cameraTransform.position + Vector3.forward * 0.1f, Quaternion.identity);
+    }
+    
+    public void PlayerDamageEffect()
+    {
+        viewOfDamage.PlayerDamageEffect();
     }
 }

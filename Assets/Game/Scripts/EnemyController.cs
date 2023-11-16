@@ -15,6 +15,7 @@ namespace MocopiAIGame
         [SerializeField] private Transform rightHandTransform;
         [SerializeField] private Material enemyMaterial;
         [SerializeField] private GameObject fireImpactPrefab;
+        [SerializeField] private EnemyHP enemyHP;
         private PKFire _pkFire;
         private PKThunder _pkThunder;
         public Sequence JumpTween;
@@ -63,7 +64,6 @@ namespace MocopiAIGame
 
         private void ThrowEffect()
         {
-            Debug.Log("炎をなげる");
             GameObject fire = Instantiate(fireBall, rightHandTransform.position, Quaternion.identity);
             FireBallAnimation fireBallAnimation = fire.GetComponent<FireBallAnimation>();
             FirePool.Instance.fireBallAnimations.Add(fireBallAnimation);
@@ -83,15 +83,16 @@ namespace MocopiAIGame
                     .OnComplete(() =>
                     {
                         _pkThunder.OnPKThunder += ThunderAttack;
-                        UniTask.Delay(2000).Forget();
+                        UniTask.Delay(2000);
                         TimeManager.Instance.SlowDownTime();
                     })).SetLink(gameObject)
                 .Append(this.transform.DOMove(endValue:
-                        new Vector3(0f, 0.0f, 0), duration: 1.0f).SetEase(Ease.InSine)
+                        Camera.main.transform.position, duration: 1.0f).SetEase(Ease.InSine)
                     .OnComplete(() =>
                     {
                         _pkThunder.OnPKThunder -= ThunderAttack;
                         TimeManager.Instance.ResetTime();
+                        _player.PlayerDamageEffect();
                         SelectAttack(7f);
                     })).SetLink(gameObject)
                 .Append(this.transform.DOJump(
@@ -100,7 +101,6 @@ namespace MocopiAIGame
 
         private void ThunderAttack()
         {
-            Debug.Log("サンダー攻撃");
             _pkThunder.OnPKThunder -= ThunderAttack;
             JumpTween.Kill();
             _player.SpawnFreezeBall();
@@ -117,36 +117,30 @@ namespace MocopiAIGame
         public async void DamageEffect()
         {
             Instantiate(fireImpactPrefab, EnemyPosition.Instance.chestTransform.position, Quaternion.identity);
+            enemyHP.Damage(20f);
             TimeManager.Instance.StopTime();
             Sequence sequence = DOTween.Sequence();
             sequence.Append(enemyMaterial.DOColor(Color.white, 0.1f))
                 .Append(enemyMaterial.DOColor(Color.black, 0.1f))
                 .Append(enemyMaterial.DOColor(Color.white, 0.1f))
                 .Append(enemyMaterial.DOColor(Color.black, 0.1f));
-            await UniTask.Delay(50);
+            await UniTask.Delay(10);
             TimeManager.Instance.ResetTime();
         }
         
         public void StunAnimation()
         {
             _animator.SetTrigger(StunHash);
-            StunEvent();
         }
 
         public async UniTask StunEvent()
         {
             _isPKFire = false;
-            await UniTask.Delay(300);
-            TimeManager.Instance.SlowDownTime();
             _pkFire.OnPKFire += PlayerFireAttack;
-            await UniTask.Delay(300);
+            await UniTask.Delay(3800);
             if (!_isPKFire)
             {
                 _pkFire.OnPKFire -= PlayerFireAttack;
-                if (TimeManager.Instance.isSlowDown)
-                {
-                    TimeManager.Instance.ResetTime();
-                }
             }
             
             SelectAttack(5f);
@@ -156,7 +150,6 @@ namespace MocopiAIGame
         {
             _isPKFire = true;
             _pkFire.OnPKFire -= PlayerFireAttack;
-            TimeManager.Instance.ResetTime();
             _player.SpawnPlayerFire();
         }
 
