@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
-    public bool isSlowDown;
+    public bool isSlowDown { get; private set; }
     public static TimeManager Instance { get; private set; }
     void Start()
     {
@@ -21,5 +21,10 @@ public class TimeManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         isSlowDown = false;
+    }
+    
+    public void StopTime()
+    {
+        Time.timeScale = 0.05f;
     }
 }

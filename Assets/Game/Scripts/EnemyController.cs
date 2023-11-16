@@ -114,14 +114,17 @@ namespace MocopiAIGame
             StunAnimation();
         }
 
-        public void DamageEffect()
+        public async void DamageEffect()
         {
             Instantiate(fireImpactPrefab, EnemyPosition.Instance.chestTransform.position, Quaternion.identity);
+            TimeManager.Instance.StopTime();
             Sequence sequence = DOTween.Sequence();
             sequence.Append(enemyMaterial.DOColor(Color.white, 0.1f))
                 .Append(enemyMaterial.DOColor(Color.black, 0.1f))
                 .Append(enemyMaterial.DOColor(Color.white, 0.1f))
                 .Append(enemyMaterial.DOColor(Color.black, 0.1f));
+            await UniTask.Delay(50);
+            TimeManager.Instance.ResetTime();
         }
         
         public void StunAnimation()
