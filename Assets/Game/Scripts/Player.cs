@@ -5,9 +5,10 @@ using DG.Tweening;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private GameObject freezeBallPrefab = null;
-    [SerializeField] private GameObject pkFireBallPrefab = null;
+    [SerializeField] private GameObject freezeBallPrefab;
+    [SerializeField] private GameObject pkFireBallPrefab;
     [SerializeField] private ViewOfDamage viewOfDamage;
+    [SerializeField] private PlayerHP playerHP;
     private Transform cameraTransform = null;
     
     
@@ -31,5 +32,6 @@ public class Player : MonoBehaviour
     public void PlayerDamageEffect()
     {
         viewOfDamage.PlayerDamageEffect();
+        playerHP.Damage(20f);
     }
 }

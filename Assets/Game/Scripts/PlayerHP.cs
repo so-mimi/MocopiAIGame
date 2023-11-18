@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using MocopiAIGame;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EnemyHP : MonoBehaviour
+public class PlayerHP : MonoBehaviour
 {
     [SerializeField] private Slider slider = null;
     private float maxHP = 100f;
@@ -25,15 +24,6 @@ public class EnemyHP : MonoBehaviour
     {
         currentHP -= damage;
         SetHP(currentHP);
-        DeathCheck();
     }
     
-    private void DeathCheck()
-    {
-        if (currentHP <= 0)
-        {
-            EnemyController enemyController = GetComponent<EnemyController>();
-            enemyController.DeathAnimation();
-        }
-    }
 }

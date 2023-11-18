@@ -16,6 +16,8 @@ namespace MocopiAIGame
         [SerializeField] private Material enemyMaterial;
         [SerializeField] private GameObject fireImpactPrefab;
         [SerializeField] private EnemyHP enemyHP;
+        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioClip damageClip;
         private PKFire _pkFire;
         private PKThunder _pkThunder;
         public Sequence JumpTween;
@@ -117,7 +119,6 @@ namespace MocopiAIGame
         public async void DamageEffect()
         {
             Instantiate(fireImpactPrefab, EnemyPosition.Instance.chestTransform.position, Quaternion.identity);
-            enemyHP.Damage(20f);
             TimeManager.Instance.StopTime();
             Sequence sequence = DOTween.Sequence();
             sequence.Append(enemyMaterial.DOColor(Color.white, 0.1f))
@@ -125,6 +126,8 @@ namespace MocopiAIGame
                 .Append(enemyMaterial.DOColor(Color.white, 0.1f))
                 .Append(enemyMaterial.DOColor(Color.black, 0.1f));
             await UniTask.Delay(10);
+            enemyHP.Damage(20f);
+            audioSource.PlayOneShot(damageClip);
             TimeManager.Instance.ResetTime();
         }
         
@@ -157,6 +160,13 @@ namespace MocopiAIGame
         {
             this.transform.DOJump(
         new Vector3(0f, 0f, 7f), jumpPower: 2f, numJumps: 1, duration: 2f);
+        }
+        
+        public async void DeathAnimation()
+        {
+            _animator.SetTrigger("Death");
+            await UniTask.Delay(5000);
+            gameObject.SetActive(false);
         }
     }
 }
