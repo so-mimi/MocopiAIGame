@@ -20,9 +20,11 @@ namespace MocopiAIGame
         [SerializeField] private AudioClip damageClip;
         private PKFire _pkFire;
         private PKThunder _pkThunder;
+        private Punch _punch;
         public Sequence JumpTween;
         private Player _player;
         private bool _isPKFire;
+        private bool _isPunch;
 
         private static readonly int ThrowAttackHash = Animator.StringToHash("ThrowAttack");
         private static readonly int JumpAttackHash = Animator.StringToHash("JumpAttack");
@@ -33,9 +35,11 @@ namespace MocopiAIGame
         {
             _pkFire = FindObjectOfType<PKFire>();
             _pkThunder = FindObjectOfType<PKThunder>();
+            _punch = FindObjectOfType<Punch>();
             _animator = GetComponent<Animator>();
             _player = FindObjectOfType<Player>();
             SelectAttack(3f);
+            
         }
         
         /// <summary>
@@ -45,12 +49,16 @@ namespace MocopiAIGame
         public async UniTask SelectAttack(float waitTimeSec)
         {
             await UniTask.Delay((int) (waitTimeSec * 1000));
-            int random = Random.Range(0, 2);
+            int random = Random.Range(0, 3);
             if (random == 0)
             {
                 ThrowAnimation();
             }
-            else
+            else if (random == 1)
+            {
+                WalkAnimation();
+            }
+            else if (random == 2)
             {
                 JumpAnimation();
             }
@@ -106,6 +114,57 @@ namespace MocopiAIGame
             _pkThunder.OnPKThunder -= ThunderAttack;
             JumpTween.Kill();
             _player.SpawnFreezeBall();
+        }
+
+        public void WalkAnimation()
+        {
+            _animator.SetTrigger("Walk");
+            WalkMove();
+        }
+
+        public void WalkMove()
+        {
+            transform.DOMove(new Vector3(0f, 0f, 3f), 1f).SetEase(Ease.Linear).OnComplete(() =>
+            {
+                PunchAnimation();
+            });
+        }
+        
+        public void PunchAnimation()
+        {
+            _animator.SetBool("Punch", true);
+        }
+        
+        public async void PunchEvent()
+        {
+            _isPunch = false;
+            TimeManager.Instance.StopTime();
+            _punch.OnPunch += PlayerPunchAttack;
+            await UniTask.Delay(250);
+            if (!_isPunch)
+            {
+                _animator.SetBool("Punch", false);
+                _punch.OnPunch -= PlayerPunchAttack;
+                TimeManager.Instance.ResetTime();
+                _player.PlayerDamageEffect();
+                MoveDefaultPosition();
+                SelectAttack(5f);
+            }
+        }
+        
+        private void PlayerPunchAttack()
+        {
+            _isPunch = true;
+            _animator.SetBool("Punch", false);
+            _punch.OnPunch -= PlayerPunchAttack;
+            TimeManager.Instance.ResetTime();
+            DamageAnimation();
+            MoveDefaultPosition();
+        }
+        
+        private void MoveDefaultPosition()
+        {
+            transform.DOMove(new Vector3(0f, 0f, 7f), 1f).SetEase(Ease.Linear);
         }
 
         public async UniTask DamageAnimation()

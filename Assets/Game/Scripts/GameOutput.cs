@@ -57,6 +57,10 @@ public class GameOutput : MonoBehaviour
             {
                 results[i] *= 0.02f;
             }
+            if (i == 4)
+            {
+                results[i] *= 0.8f;
+            }
             
             if (max < results[i])
             {
