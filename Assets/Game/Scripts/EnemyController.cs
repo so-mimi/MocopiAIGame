@@ -1,6 +1,8 @@
 using DG.Tweening;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using UniRx;
+using UnityEngine.Serialization;
 
 namespace MocopiAIGame
 {
@@ -26,11 +28,14 @@ namespace MocopiAIGame
         private Player _player;
         private bool _isPKFire;
         private bool _isPunch;
+        [FormerlySerializedAs("_isTutorial")] public bool isTutorial;
 
         private static readonly int ThrowAttackHash = Animator.StringToHash("ThrowAttack");
         private static readonly int JumpAttackHash = Animator.StringToHash("JumpAttack");
         private static readonly int DamageHash = Animator.StringToHash("Damage");
         private static readonly int StunHash = Animator.StringToHash("Stun");
+        
+        public Subject<Unit> OnPunch = new Subject<Unit>();
         
         private void Start()
         {
@@ -40,12 +45,11 @@ namespace MocopiAIGame
             _kick = FindObjectOfType<Kick>();
             _animator = GetComponent<Animator>();
             _player = FindObjectOfType<Player>();
-            SelectAttack(3f);
-            
         }
         
         /// <summary>
         /// 敵の攻撃セレクト
+        /// この関数を呼び出すことで、ゲームの根幹となる敵の攻撃を選択する
         /// </summary>
         /// <param name="waitTimeSec"></param>
         public async UniTask SelectAttack(float waitTimeSec)
@@ -143,6 +147,11 @@ namespace MocopiAIGame
         
         public async void PunchEvent()
         {
+            if (isTutorial)
+            {
+                await TutorialPunch();
+                return;
+            }
             _isPunch = false;
             TimeManager.Instance.SlowDownTime();
             _animator.speed = 0.25f;
@@ -158,6 +167,17 @@ namespace MocopiAIGame
                 MoveDefaultPosition();
                 SelectAttack(5f);
             }
+        }
+
+        /// <summary>
+        /// チュートリアル用のパンチイベント
+        /// </summary>
+        public async UniTask TutorialPunch()
+        {
+            _animator.speed = 0.01f;
+            await UniTask.Delay(1000);
+            _animator.speed = 0f;
+            OnPunch.OnNext(Unit.Default);
         }
         
         private void PlayerPunchAttack()
