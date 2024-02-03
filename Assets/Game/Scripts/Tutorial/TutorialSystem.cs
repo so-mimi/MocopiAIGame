@@ -58,14 +58,49 @@ public class TutorialSystem : MonoBehaviour
     private async UniTask PunchTutorial()
     {
         await ChangeTutorialText("敵がこの動きをしてきたら\nパンチで反撃しよう！");
+        //TODO: ここで0に合わせてパンチをする旨、パンチの動画を再生する
         _enemyController.WalkAnimation();
         // チュートリアル用のパンチイベントを発行が発行されるまで待つ
         await _enemyController.OnPunch.First();
+        //4がパンチのモーション番号
         await CountDown(4);
-        
+        _enemyController.DefaultPositionAndAnimation();
+        KickTutorial();
     }
-    
-    
+
+    private async UniTask KickTutorial()
+    {
+        await ChangeTutorialText("敵がこの動きをしてきたら\nキックで反撃しよう！");
+        //TODO: ここで0に合わせてkickをする旨、パンチの動画を再生する
+        _enemyController.WalkAnimationTwo();
+        // チュートリアル用のキックイベントを発行が発行されるまで待つ
+        await _enemyController.OnTwoHandAttack.First();
+        //5がキックのモーション番号
+        await CountDown(5);
+        _enemyController.DefaultPositionAndAnimation();
+        HitTutorial();
+    }
+
+    private async UniTask HitTutorial()
+    {
+        await ChangeTutorialText("敵がこの動きをしてきたら\nヒットで反撃しよう！");
+        //TODO: ここで0に合わせてkickをする旨、パンチの動画を再生する
+        _enemyController.ThrowAnimation();
+        // チュートリアル用のヒットイベントを発行が発行されるまで待つ
+        await _enemyController.OnThrow.First();
+        //2がヒットのモーション番号
+        await CountDown(2);
+        FirePool.Instance.Clean();
+        _enemyController.DefaultPositionAndAnimation();
+        PKFreezeTutorial();
+    }
+
+    private async UniTask PKFreezeTutorial()
+    {
+        await ChangeTutorialText("敵がこの動きをしてきたら\nPKフリーズで反撃しよう！");
+    }
+
+
     /// <summary>
     /// チュートリアルの文字の切り替えをいい感じにする
     /// </summary>
@@ -81,38 +116,38 @@ public class TutorialSystem : MonoBehaviour
     /// 0番目:PKファイヤ 1番目PKフリーズ 2番目:打つ 3番目:その他 4番目:パンチ 5番目:蹴る
     /// </summary>
     /// <param name="motionNumber"></param>
-    private async UniTask CountDown(int motionNumber)
+    public async UniTask CountDown(int motionNumber)
     {
+        UniTaskCompletionSource completionSource = new UniTaskCompletionSource();
+
         countDownCanvasGroup.alpha = 0;
         countDownCanvasGroup.DOFade(1, 0.5f).SetLink(gameObject);
         List<float> motionData = new List<float>();
-        //motionDataはmodel.motionCountの長さを持ち、currentCountDownMotionNumber番目の要素にはcurrentCountDownTimes番目だけ1で、ほかは0が入っている
+
         for (int i = 0; i < 6; i++)
         {
-            if (i == motionNumber)
-            {
-                motionData.Add(1);
-            }
-            else
-            {
-                motionData.Add(0);
-            }
+            motionData.Add(i == motionNumber ? 1 : 0);
         }
-        // UniRxを使って5秒のカウントダウンを行う、のこり2秒になったらMotionDataInputerに記録を開始させる, その後カウントダウンを非表示にする
-        Observable.Timer(System.TimeSpan.FromSeconds(0), System.TimeSpan.FromSeconds(1))
+
+        Observable.Timer(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1))
             .Take(6)
-            .Subscribe(count =>
-            {
-                countDownText.text = (5 - count).ToString();
-                if (count == 2)
+            .Subscribe(
+                count =>
                 {
-                    motionDataInputer.DataInputTimer(motionData);
-                }
-                if (count == 5)
-                {
-                    countDownCanvasGroup.DOFade(0, 0.5f).SetLink(gameObject);
-                }
-            }).AddTo(this);
+                    countDownText.text = (5 - count).ToString();
+                    if (count == 2)
+                    {
+                        motionDataInputer.DataInputTimer(motionData); // ここでのmotionDataInputerとDataInputTimerは例です。実際のメソッド名に置き換えてください。
+                    }
+                    if (count == 5)
+                    {
+                        countDownCanvasGroup.DOFade(0, 0.5f).SetLink(gameObject).OnComplete(() => completionSource.TrySetResult());
+                    }
+                },
+                () => completionSource.TrySetResult()) // オブザーバブルが完了したときに呼び出されます。
+            .AddTo(this);
+
+        await completionSource.Task; // ここでカウントダウンの完了を待機します。
     }
     
 }

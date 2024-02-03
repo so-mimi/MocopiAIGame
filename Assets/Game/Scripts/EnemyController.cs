@@ -1,8 +1,10 @@
+using System;
 using DG.Tweening;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 namespace MocopiAIGame
 {
@@ -36,7 +38,9 @@ namespace MocopiAIGame
         private static readonly int StunHash = Animator.StringToHash("Stun");
         
         public Subject<Unit> OnPunch = new Subject<Unit>();
-        
+        public Subject<Unit> OnTwoHandAttack = new Subject<Unit>();
+        public Subject<Unit> OnThrow = new Subject<Unit>();
+         
         private void Start()
         {
             _pkFire = FindObjectOfType<PKFire>();
@@ -75,18 +79,24 @@ namespace MocopiAIGame
         }
 
         /// <summary>
-        /// 炎を投げる攻撃
+        /// 炎を投げる攻撃の最初の関数
         /// </summary>
-        private void ThrowAnimation()
+        public void ThrowAnimation()
         {
             _animator.SetTrigger(ThrowAttackHash);
         }
 
-        private void ThrowEffect()
+        private async UniTask ThrowEffect()
         {
             GameObject fire = Instantiate(fireBall, rightHandTransform.position, Quaternion.identity);
             FireBallAnimation fireBallAnimation = fire.GetComponent<FireBallAnimation>();
             FirePool.Instance.fireBallAnimations.Add(fireBallAnimation);
+            
+            if (!isTutorial) return;
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(1f));
+            _animator.speed = 0.01f;
+            OnThrow.OnNext(Unit.Default);
         }
         
         private void JumpAnimation()
@@ -180,6 +190,17 @@ namespace MocopiAIGame
             OnPunch.OnNext(Unit.Default);
         }
         
+        /// <summary>
+        /// キャラクターを初期位置、初期アニメーションに戻す
+        /// </summary>
+        public void DefaultPositionAndAnimation()
+        {
+            transform.DOMove(new Vector3(0f, 0f, 7f), 1f).SetEase(Ease.Linear);
+            _animator.SetBool("Punch", false);
+            _animator.SetBool("TwoHandAttack", false);
+            _animator.speed = 1f;
+        }
+        
         private void PlayerPunchAttack()
         {
             _isPunch = true;
@@ -196,13 +217,16 @@ namespace MocopiAIGame
             transform.DOMove(new Vector3(0f, 0f, 7f), 1f).SetEase(Ease.Linear);
         }
         
-        private void WalkAnimationTwo()
+        /// <summary>
+        /// 両手攻撃の開始の関数
+        /// </summary>
+        public void WalkAnimationTwo()
         {
             _animator.SetTrigger("Walk");
             WalkMoveTwo();
         }
         
-        public void WalkMoveTwo()
+        private void WalkMoveTwo()
         {
             transform.DOMove(new Vector3(0f, 0f, 3f), 1f).SetEase(Ease.Linear).OnComplete(() =>
             {
@@ -217,6 +241,11 @@ namespace MocopiAIGame
         
         public async void TwoHandEvent()
         {
+            if (isTutorial)
+            {
+                await TutorialTwoHandAttack();
+                return;
+            }
             _isPunch = false;
             TimeManager.Instance.SlowDownTime();
             _animator.speed = 0.25f;
@@ -232,6 +261,14 @@ namespace MocopiAIGame
                 MoveDefaultPosition();
                 SelectAttack(5f);
             }
+        }
+        
+        private async UniTask TutorialTwoHandAttack()
+        {
+            _animator.speed = 0.1f;
+            await UniTask.Delay(1000);
+            _animator.speed = 0f;
+            OnTwoHandAttack.OnNext(Unit.Default);
         }
         
         private void PlayerKickAttack()

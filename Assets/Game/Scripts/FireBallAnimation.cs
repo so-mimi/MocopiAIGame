@@ -21,13 +21,18 @@ public class FireBallAnimation : MonoBehaviour
         _cameraTransform = Camera.main.transform;
         _tween = transform.DOMove(_cameraTransform.position + _cameraTransform.forward * 0.1f, 5f).OnStart(() =>
         {
+            if (_enemyController.isTutorial)
+            {
+                _tween.Kill();
+                return;
+            }
             FireBallTime();
         }).OnComplete(() =>
         {
             _player.PlayerDamageEffect();
             _enemyController.SelectAttack(5f);
             gameObject.SetActive(false);
-        });
+        }).SetLink(gameObject);
     }
 
     private async UniTask FireBallTime()

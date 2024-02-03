@@ -12,4 +12,12 @@ public class FirePool : MonoBehaviour
     {
         Instance = this;
     }
+    
+    public void Clean()
+    {
+        foreach (var fireBallAnimation in fireBallAnimations)
+        {
+            fireBallAnimation.gameObject.SetActive(false);
+        }
+    }
 }
