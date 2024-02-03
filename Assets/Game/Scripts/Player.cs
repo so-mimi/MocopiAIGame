@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private GameObject freezeBallPrefab;
     [SerializeField] private GameObject pkFireBallPrefab;
-    [SerializeField] private ViewOfDamage viewOfDamage;
+    [SerializeField] private ViewOfWhole viewOfDamage;
     [SerializeField] private PlayerHP playerHP;
     private Transform cameraTransform = null;
     

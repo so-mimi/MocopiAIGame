@@ -21,6 +21,7 @@ namespace MocopiAIGame
         private PKFire _pkFire;
         private PKThunder _pkThunder;
         private Punch _punch;
+        private Kick _kick;
         public Sequence JumpTween;
         private Player _player;
         private bool _isPKFire;
@@ -36,6 +37,7 @@ namespace MocopiAIGame
             _pkFire = FindObjectOfType<PKFire>();
             _pkThunder = FindObjectOfType<PKThunder>();
             _punch = FindObjectOfType<Punch>();
+            _kick = FindObjectOfType<Kick>();
             _animator = GetComponent<Animator>();
             _player = FindObjectOfType<Player>();
             SelectAttack(3f);
@@ -49,7 +51,7 @@ namespace MocopiAIGame
         public async UniTask SelectAttack(float waitTimeSec)
         {
             await UniTask.Delay((int) (waitTimeSec * 1000));
-            int random = Random.Range(0, 3);
+            int random = Random.Range(0, 4);
             if (random == 0)
             {
                 ThrowAnimation();
@@ -61,6 +63,10 @@ namespace MocopiAIGame
             else if (random == 2)
             {
                 JumpAnimation();
+            }
+            else if (random == 3)
+            {
+                WalkAnimationTwo();
             }
         }
 
@@ -138,13 +144,15 @@ namespace MocopiAIGame
         public async void PunchEvent()
         {
             _isPunch = false;
-            TimeManager.Instance.StopTime();
+            TimeManager.Instance.SlowDownTime();
+            _animator.speed = 0.25f;
             _punch.OnPunch += PlayerPunchAttack;
-            await UniTask.Delay(250);
+            await UniTask.Delay(1000);
             if (!_isPunch)
             {
                 _animator.SetBool("Punch", false);
                 _punch.OnPunch -= PlayerPunchAttack;
+                _animator.speed = 1f;
                 TimeManager.Instance.ResetTime();
                 _player.PlayerDamageEffect();
                 MoveDefaultPosition();
@@ -157,6 +165,7 @@ namespace MocopiAIGame
             _isPunch = true;
             _animator.SetBool("Punch", false);
             _punch.OnPunch -= PlayerPunchAttack;
+            _animator.speed = 1f;
             TimeManager.Instance.ResetTime();
             DamageAnimation();
             MoveDefaultPosition();
@@ -165,6 +174,55 @@ namespace MocopiAIGame
         private void MoveDefaultPosition()
         {
             transform.DOMove(new Vector3(0f, 0f, 7f), 1f).SetEase(Ease.Linear);
+        }
+        
+        private void WalkAnimationTwo()
+        {
+            _animator.SetTrigger("Walk");
+            WalkMoveTwo();
+        }
+        
+        public void WalkMoveTwo()
+        {
+            transform.DOMove(new Vector3(0f, 0f, 3f), 1f).SetEase(Ease.Linear).OnComplete(() =>
+            {
+                TwoHandAnimation();
+            });
+        }
+        
+        public void TwoHandAnimation()
+        {
+            _animator.SetBool("TwoHandAttack", true);
+        }
+        
+        public async void TwoHandEvent()
+        {
+            _isPunch = false;
+            TimeManager.Instance.SlowDownTime();
+            _animator.speed = 0.25f;
+            _kick.OnKick += PlayerKickAttack;
+            await UniTask.Delay(1000);
+            if (!_isPunch)
+            {
+                _animator.SetBool("TwoHandAttack", false);
+                _kick.OnKick -= PlayerKickAttack;
+                _animator.speed = 1f;
+                TimeManager.Instance.ResetTime();
+                _player.PlayerDamageEffect();
+                MoveDefaultPosition();
+                SelectAttack(5f);
+            }
+        }
+        
+        private void PlayerKickAttack()
+        {
+            _isPunch = true;
+            _animator.SetBool("TwoHandAttack", false);
+            _kick.OnKick -= PlayerKickAttack;
+            _animator.speed = 1f;
+            TimeManager.Instance.ResetTime();
+            DamageAnimation();
+            MoveDefaultPosition();
         }
 
         public async UniTask DamageAnimation()
