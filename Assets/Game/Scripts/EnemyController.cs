@@ -36,11 +36,12 @@ namespace MocopiAIGame
         private static readonly int JumpAttackHash = Animator.StringToHash("JumpAttack");
         private static readonly int DamageHash = Animator.StringToHash("Damage");
         private static readonly int StunHash = Animator.StringToHash("Stun");
+        private static readonly int TutorialStunHash = Animator.StringToHash("TutorialStun");
         
         public Subject<Unit> OnPunch = new Subject<Unit>();
         public Subject<Unit> OnTwoHandAttack = new Subject<Unit>();
         public Subject<Unit> OnThrow = new Subject<Unit>();
-         
+        public Subject<Unit> OnJump = new Subject<Unit>();
         private void Start()
         {
             _pkFire = FindObjectOfType<PKFire>();
@@ -99,17 +100,23 @@ namespace MocopiAIGame
             OnThrow.OnNext(Unit.Default);
         }
         
-        private void JumpAnimation()
+        public void JumpAnimation()
         {
             _animator.SetTrigger(JumpAttackHash);
         }
 
         private void JumpMove()
         {
+            if (isTutorial)
+            {
+                TutorialJump();
+                return;
+            }
+            
             //TODO: VRPlayerの位置を取得して、そこに向かってジャンプする
             JumpTween = DOTween.Sequence(); //Sequence生成
             JumpTween.Append(this.transform.DOMove(endValue:
-                        new Vector3(0f, 5.0f, 0), duration: 2.0f).SetEase(Ease.InOutQuad)
+                        new Vector3(0f, 2.5f, 3.0f), duration: 2.0f).SetEase(Ease.InOutQuad)
                     .OnComplete(() =>
                     {
                         _pkThunder.OnPKThunder += ThunderAttack;
@@ -127,6 +134,17 @@ namespace MocopiAIGame
                     })).SetLink(gameObject)
                 .Append(this.transform.DOJump(
                     new Vector3(0f, 0f, 7f), jumpPower: 2f, numJumps: 1, duration: 2f));
+        }
+
+        private void TutorialJump()
+        {
+            this.transform.DOMove(endValue:
+                new Vector3(0f, 2.5f, 3.0f), duration: 2.0f).SetEase(Ease.InOutQuad)
+                .OnComplete(() =>
+                {
+                    OnJump.OnNext(Unit.Default);
+                    _animator.speed = 0f;
+                });
         }
 
         private void ThunderAttack()
@@ -198,6 +216,7 @@ namespace MocopiAIGame
             transform.DOMove(new Vector3(0f, 0f, 7f), 1f).SetEase(Ease.Linear);
             _animator.SetBool("Punch", false);
             _animator.SetBool("TwoHandAttack", false);
+            _animator.SetBool(TutorialStunHash, false);
             _animator.speed = 1f;
         }
         
@@ -309,9 +328,19 @@ namespace MocopiAIGame
         {
             _animator.SetTrigger(StunHash);
         }
+        
+        public void TutorialStunAnimation()
+        {
+            _animator.SetBool(TutorialStunHash, true);
+        }
 
         public async UniTask StunEvent()
         {
+            if (isTutorial)
+            {
+                return;
+            }
+            
             _isPKFire = false;
             _pkFire.OnPKFire += PlayerFireAttack;
             await UniTask.Delay(3800);

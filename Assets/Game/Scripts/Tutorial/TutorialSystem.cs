@@ -98,6 +98,28 @@ public class TutorialSystem : MonoBehaviour
     private async UniTask PKFreezeTutorial()
     {
         await ChangeTutorialText("敵がこの動きをしてきたら\nPKフリーズで反撃しよう！");
+        _enemyController.JumpAnimation();
+        // チュートリアル用のPKサンダーイベントを発行が発行されるまで待つ
+        await _enemyController.OnJump.First();
+        //1がPKサンダーのモーション番号
+        await CountDown(1);
+        _enemyController.DefaultPositionAndAnimation();
+        PKFireTutorial();
+    }
+    
+    private async UniTask PKFireTutorial()
+    {
+        await ChangeTutorialText("敵が疲れていたら\nPKファイヤで攻撃しよう！");
+        _enemyController.TutorialStunAnimation();
+        // 0がPKファイヤのモーション番号
+        await CountDown(0);
+        _enemyController.DefaultPositionAndAnimation();
+        MakeAITime();
+    }
+    
+    private async UniTask MakeAITime()
+    {
+        await ChangeTutorialText("あなたの動きから\nAIを作成しているよ！");
     }
 
 
