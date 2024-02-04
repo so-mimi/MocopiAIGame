@@ -122,7 +122,7 @@ public class TutorialSystem : MonoBehaviour
     {
         await ChangeTutorialText("あなたの動きから\nAIを作成しているよ！");
         //テスト送信
-        sendData.SendCSVPath("a");
+        sendData.SendCSVPath(motionDataInputer.filePath);
     }
 
 

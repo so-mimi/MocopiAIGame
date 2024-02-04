@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -51,6 +52,7 @@ public class MotionDataInputer : MonoBehaviour
     List<float> data = new List<float>();
     
     private string _fileName = "";
+    public string filePath = "";
     
     /// <summary>
     /// この関数を呼び出した際に、position,rotationのデータの保存を開始する
@@ -173,7 +175,6 @@ public class MotionDataInputer : MonoBehaviour
     
     public void LogSave(List<float> x, string fileName)
     {
-        string filePath = "";
         if (inputMode == InputMode.Debug)
         {
             filePath = Application.dataPath + "/" + fileName + ".csv";
