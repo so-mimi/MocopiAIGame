@@ -21,6 +21,7 @@ public class TutorialSystem : MonoBehaviour
     
     [Header("システム")]
     [SerializeField] private MotionDataInputer motionDataInputer;
+    [SerializeField] private SendData sendData;
     
     private EnemyController _enemyController;
     
@@ -120,6 +121,8 @@ public class TutorialSystem : MonoBehaviour
     private async UniTask MakeAITime()
     {
         await ChangeTutorialText("あなたの動きから\nAIを作成しているよ！");
+        //テスト送信
+        sendData.SendCSVPath("a");
     }
 
 
