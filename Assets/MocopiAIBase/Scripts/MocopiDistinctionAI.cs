@@ -1,5 +1,8 @@
 using System;
+using Cysharp.Threading.Tasks;
 using Unity.Sentis;
+using Unity.Sentis.ONNX;
+using UnityEditor;
 using UnityEngine;
 
 namespace MocopiDistinction
@@ -9,8 +12,7 @@ namespace MocopiDistinction
     /// </summary>
     internal class MocopiDistinctionAI : MonoBehaviour
     {
-        [Header("ONNXモデル"),SerializeField] 
-        private ModelAsset nnModel = null;
+        [Header("ONNXモデル")] public ModelAsset nnModel;
         private Model _runtimeModel;
         private TensorFloat _inputTensor;
         private IWorker _engine;
@@ -20,17 +22,19 @@ namespace MocopiDistinction
         {
             public float[] data;
         }
-        
-        private void Awake()
+
+        /// <summary>
+        /// onnxモデルをロードする
+        /// </summary>
+        /// <param name="newNnModel"></param>
+        public void RoadModel()
         {
-            if (nnModel == null)
-            {
-                Debug.LogError("ONNXモデルを設定してください");
-            }
-            
             _runtimeModel = ModelLoader.Load(nnModel);
         }
         
+        /// <summary>
+        /// OnnxモデルをもとにAIを実行する
+        /// </summary>
         public float[] RunAI(MotionData motionData)
         {
             _engine = WorkerFactory.CreateWorker(BackendType.CPU, _runtimeModel);
@@ -50,7 +54,6 @@ namespace MocopiDistinction
         private void OnDestroy()
         {
             _engine?.Dispose();
-            
         }
     }
 }

@@ -1,4 +1,10 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 using UnityEngine;
 using UniRx;
 
@@ -30,9 +36,22 @@ namespace MocopiDistinction
         [SerializeField] private Transform RHandTransform = null;
         [SerializeField] private Transform LHandTransform = null;
         
+        [System.Serializable]
+        public class MotionData
+        {
+            public float[] data;
+        }
+        
         private List<float> _data = new();
-        float timer = 0.0f;
-        float interval = 0.1f;
+        [SerializeField]
+        private int serverPort = 6789; // FastAPIサーバーのURL
+        private float timer = 0.0f;
+        private float interval = 0.1f;
+        
+        private Thread receiveThread;
+        private UdpClient client;
+        private int listenPort = 6790; // Pythonサーバーが応答を送信するポート
+
 
         public InputJointAndGetResult(float[] results)
         {
@@ -41,48 +60,30 @@ namespace MocopiDistinction
 
         public float[] results;
         
-        void Start()
+        public void BiginToAI()
         {
-            //Test
-            if (mocopiDistinctionAI == null)
-            {
-                Debug.LogError("MocopiDistinctionAIを設定してください");
-            }
-            
-            if (_data == null)
-            {
-                _data = new List<float>();
-            }
-            
-            MocopiDistinctionAI.MotionData motionData = new MocopiDistinctionAI.MotionData();
-            
-            //UniRxを用いて0.1秒ごとに処理を行う
+            // UniRxを用いて0.1秒ごとに処理を行う
             Observable.EveryUpdate()
+                .Where(_ => timer > interval)
                 .Subscribe(_ =>
                 {
-                    timer += Time.deltaTime;
-                    if (timer >= interval)
-                    {
-                        // 0.1秒ごとの処理
-                        // モーションデータを取得
-                        motionData.data = GetMotionData();
-
-                        if (motionData.data.Length < 2610)
-                        {
-                            Debug.Log("モーション取得中");
-                            return;
-                        }
-                        // AIにモーションデータを渡して結果を受け取る
-                        results = mocopiDistinctionAI.RunAI(motionData);
-
-                        timer = 0.0f; // タイマーリセット
-                    }
+                    timer = 0f;  // タイマーリセット
+                    SendMotionDataToServer();
                 })
                 .AddTo(this);
+        }
+        
+        void Update()
+        {
+            timer += Time.deltaTime;
         }
 
         private float[] GetMotionData()
         {
+            if (_data == null)
+            {
+                _data = new List<float>();
+            }
             _data.Add(rootTransform.localPosition.x);
             _data.Add(rootTransform.localPosition.y);
             _data.Add(rootTransform.localPosition.z);
@@ -180,9 +181,41 @@ namespace MocopiDistinction
             return _data.ToArray();
         }
         
-        private void OnDestroy()
+        private void SendMotionDataToServer()
         {
-            _data.Clear();
+            float[] motionData = GetMotionData();  // モーションデータを取得するメソッドを想定
+            if (motionData.Length < 2610)
+            {
+                Debug.Log("モーション取得中");
+                return;
+            }
+
+            // モーションデータをJSONに変換してサーバーに送信
+            SendData(motionData);
+        }
+
+        // UDP送信用のメソッド
+        public void SendData(float[] motionData)
+        {
+            UdpClient udpClient = new UdpClient();
+            try
+            {
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, serverPort); // 送信先のエンドポイント
+
+                // モーションデータをJSON文字列にシリアライズ
+                string json = JsonUtility.ToJson(new MotionData { data = motionData });
+                byte[] sendBytes = Encoding.UTF8.GetBytes(json);
+
+                udpClient.Send(sendBytes, sendBytes.Length, endPoint); // 指定したエンドポイントにデータを送信
+            }
+            catch (SocketException e)
+            {
+                Debug.LogError($"SocketException: {e.Message}");
+            }
+            finally
+            {
+                udpClient.Close();
+            }
         }
     }
 }

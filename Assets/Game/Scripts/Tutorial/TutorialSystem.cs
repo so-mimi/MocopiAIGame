@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using MocopiAIGame;
+using MocopiDistinction;
 using TMPro;
 using UniRx;
 using UnityEngine;
@@ -22,8 +23,11 @@ public class TutorialSystem : MonoBehaviour
     [Header("システム")]
     [SerializeField] private MotionDataInputer motionDataInputer;
     [SerializeField] private SendData sendData;
+    [SerializeField] private MocopiDistinctionAI mocopiDistinctionAI;
     
     private EnemyController _enemyController;
+    
+    [SerializeField] private GameObject[] onlyTutorialObjects;
     
     void Start()
     {
@@ -98,7 +102,7 @@ public class TutorialSystem : MonoBehaviour
 
     private async UniTask PKFreezeTutorial()
     {
-        await ChangeTutorialText("敵がこの動きをしてきたら\nPKフリーズで反撃しよう！");
+        await ChangeTutorialText("敵がこの動きをしてきたら\n腕をクロスして反撃しよう！");
         _enemyController.JumpAnimation();
         // チュートリアル用のPKサンダーイベントを発行が発行されるまで待つ
         await _enemyController.OnJump.First();
@@ -110,7 +114,7 @@ public class TutorialSystem : MonoBehaviour
     
     private async UniTask PKFireTutorial()
     {
-        await ChangeTutorialText("敵が疲れていたら\nPKファイヤで攻撃しよう！");
+        await ChangeTutorialText("敵が疲れていたら\n両手から炎を出して攻撃しよう！");
         _enemyController.TutorialStunAnimation();
         // 0がPKファイヤのモーション番号
         await CountDown(0);
@@ -173,6 +177,16 @@ public class TutorialSystem : MonoBehaviour
             .AddTo(this);
 
         await completionSource.Task; // ここでカウントダウンの完了を待機します。
+    }
+    
+    public void EndTutorial()
+    {
+        foreach (var obj in onlyTutorialObjects)
+        {
+            obj.SetActive(false);
+        }
+        _enemyController.isTutorial = false;
+        _enemyController.SelectAttack(3f);
     }
     
 }

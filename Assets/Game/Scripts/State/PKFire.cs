@@ -9,6 +9,7 @@ public class PKFire : MotionStateBase
     public Action OnPKFire;
     public override void OnEnter()
     {
+        Debug.Log("PKFire");
         OnPKFire?.Invoke();
     }
 

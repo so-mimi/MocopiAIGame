@@ -1,10 +1,17 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Text;
+using MocopiAIGame;
+using MocopiDistinction;
+using Unity.Sentis;
+using UnityEngine.Windows;
 
 public class SendData : MonoBehaviour
 {
+    [SerializeField] private InputJointAndGetResult inputJointAndGetResult;
+    [SerializeField] private TutorialSystem tutorialSystem;
     // APIのURL
     string url = "http://127.0.0.1:8000/upload-csv/";
 
@@ -34,6 +41,8 @@ public class SendData : MonoBehaviour
             else
             {
                 Debug.Log("Form upload complete!");
+                inputJointAndGetResult.BiginToAI();
+                tutorialSystem.EndTutorial();
             }
 
             // UnityWebRequestとUploadHandlerRawはusingステートメント内で自動的に破棄されます
