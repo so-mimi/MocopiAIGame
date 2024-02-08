@@ -16,6 +16,12 @@ public class EnemyHP : MonoBehaviour
         SetHP(currentHP);
     }
     
+    public void resetHP()
+    {
+        currentHP = maxHP;
+        SetHP(currentHP);
+    }
+    
     public void SetHP(float hp)
     {
         slider.value = hp;

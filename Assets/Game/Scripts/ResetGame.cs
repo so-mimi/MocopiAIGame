@@ -49,7 +49,7 @@ public class ResetGame : MonoBehaviour
         endPanel.SetActive(false);
         startPanel.SetActive(true);
         tutorialSystem.StartTutorial();
-        enemyController.enemyHP.SetHP(100);
+        enemyController.enemyHP.resetHP();
         enemy.SetActive(true);
         tutorialSystem.AppearTutorialObjects();
     }

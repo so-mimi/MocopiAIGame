@@ -33,7 +33,7 @@ namespace MocopiAIGame
         private Player _player;
         private bool _isPKFire;
         private bool _isPunch;
-        [FormerlySerializedAs("_isTutorial")] public bool isTutorial;
+        public bool isTutorial;
 
         private static readonly int ThrowAttackHash = Animator.StringToHash("ThrowAttack");
         private static readonly int JumpAttackHash = Animator.StringToHash("JumpAttack");

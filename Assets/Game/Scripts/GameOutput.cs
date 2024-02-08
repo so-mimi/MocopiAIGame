@@ -45,7 +45,7 @@ public class GameOutput : MonoBehaviour
             //感度調整
             if (i == 0)
             {
-                results[i] *= 5f;
+                results[i] *= 4f;
             }
             if (i == 1)
             {
@@ -53,7 +53,7 @@ public class GameOutput : MonoBehaviour
             }
             if (i == 2)
             {
-                results[i] *= 1f;
+                results[i] *= 0.8f;
             }
             if (i == 4)
             {
