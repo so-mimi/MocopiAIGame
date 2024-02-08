@@ -23,6 +23,8 @@ namespace MocopiAIGame
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private AudioClip damageClip;
         [SerializeField] private ResetGame resetGame;
+        [SerializeField] private Transform playerTransform;
+        
         private PKFire _pkFire;
         private PKThunder _pkThunder;
         private Punch _punch;
@@ -125,7 +127,7 @@ namespace MocopiAIGame
                         TimeManager.Instance.SlowDownTime();
                     })).SetLink(gameObject)
                 .Append(this.transform.DOMove(endValue:
-                        Camera.main.transform.position, duration: 1.0f).SetEase(Ease.InSine)
+                        playerTransform.position, duration: 1.0f).SetEase(Ease.InSine)
                     .OnComplete(() =>
                     {
                         _pkThunder.OnPKThunder -= ThunderAttack;

@@ -11,14 +11,8 @@ public class Player : MonoBehaviour
     [SerializeField] private PlayerHP playerHP;
     private Transform cameraTransform = null;
     [SerializeField] private Transform fireSpawnPoint;
-    
-    
-    void Start()
-    {
-        cameraTransform = Camera.main.transform;
-    }
-    
-    
+
+
     public void SpawnFreezeBall()
     {
         GameObject freezeBall = Instantiate(freezeBallPrefab,  fireSpawnPoint.position, Quaternion.identity);
