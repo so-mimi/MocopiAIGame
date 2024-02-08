@@ -51,7 +51,7 @@ public class MotionDataInputer : MonoBehaviour
     
     List<float> data = new List<float>();
     
-    private string _fileName = "";
+    public string _fileName = "";
     public string filePath = "";
     
     /// <summary>

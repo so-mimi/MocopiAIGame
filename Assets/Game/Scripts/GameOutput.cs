@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using MocopiDistinction;
 using UniRx;
@@ -59,11 +57,11 @@ public class GameOutput : MonoBehaviour
             }
             if (i == 4)
             {
-                results[i] *= 100f;
+                results[i] *= 80f;
             }
             if (i == 5)
             {
-                results[i] *= 0.1f;
+                results[i] *= 0.3f;
             }
             
             if (max < results[i])

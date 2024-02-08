@@ -19,9 +19,10 @@ namespace MocopiAIGame
         [SerializeField] private Transform rightHandTransform;
         [SerializeField] private Material enemyMaterial;
         [SerializeField] private GameObject fireImpactPrefab;
-        [SerializeField] private EnemyHP enemyHP;
+        public EnemyHP enemyHP;
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private AudioClip damageClip;
+        [SerializeField] private ResetGame resetGame;
         private PKFire _pkFire;
         private PKThunder _pkThunder;
         private Punch _punch;
@@ -370,6 +371,7 @@ namespace MocopiAIGame
             _animator.SetTrigger("Death");
             await UniTask.Delay(5000);
             gameObject.SetActive(false);
+            resetGame.AppearedEndPanel();
         }
     }
 }

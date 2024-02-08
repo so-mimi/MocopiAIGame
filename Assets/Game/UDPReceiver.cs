@@ -56,8 +56,7 @@ public class UDPReceiver : MonoBehaviour
                 numbers.Add(number);
             }
         }
-
-
+        
         return numbers.ToArray();
     }
 }

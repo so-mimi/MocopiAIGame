@@ -31,11 +31,9 @@ public class TutorialSystem : MonoBehaviour
     
     void Start()
     {
-        tutorialPanel.SetActive(true);
-        tutorialCanvasGroup.alpha = 0;
         _enemyController = FindObjectOfType<EnemyController>();
-        _enemyController.isTutorial = true;
         Bind();
+        StartTutorial();
     }
     
     private void Bind()
@@ -45,6 +43,13 @@ public class TutorialSystem : MonoBehaviour
             tutorialPanel.SetActive(false);
             PlayTutorialGuide();
         }).AddTo(this);
+    }
+    
+    public void StartTutorial()
+    {
+        tutorialPanel.SetActive(true);
+        tutorialCanvasGroup.alpha = 0;
+        _enemyController.isTutorial = true;
     }
 
     private async void PlayTutorialGuide()
@@ -187,6 +192,14 @@ public class TutorialSystem : MonoBehaviour
         }
         _enemyController.isTutorial = false;
         _enemyController.SelectAttack(3f);
+    }
+    
+    public void AppearTutorialObjects()
+    {
+        foreach (var obj in onlyTutorialObjects)
+        {
+            obj.SetActive(true);
+        }
     }
     
 }
