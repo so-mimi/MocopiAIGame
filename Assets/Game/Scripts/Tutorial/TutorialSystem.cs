@@ -15,9 +15,11 @@ public class TutorialSystem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI tutorialText;
     [SerializeField] private CanvasGroup countDownCanvasGroup;
     [SerializeField] private TextMeshProUGUI countDownText;
+    [SerializeField] private GameObject creditPanel;
     
     [Header("インタラクティブUI")]
     [SerializeField] private SimpleButton startButton;
+    [SerializeField] private SimpleButton creditButton;
     
     [Header("システム")]
     [SerializeField] private MotionDataInputer motionDataInputer;
@@ -43,6 +45,11 @@ public class TutorialSystem : MonoBehaviour
         {
             tutorialPanel.SetActive(false);
             PlayTutorialGuide();
+        }).AddTo(this);
+        
+        creditButton.OnClick.Subscribe(_ =>
+        {
+            SwitchCredit();
         }).AddTo(this);
     }
     
@@ -216,6 +223,11 @@ public class TutorialSystem : MonoBehaviour
         {
             obj.SetActive(true);
         }
+    }
+
+    private void SwitchCredit()
+    {
+        creditPanel.SetActive(!creditPanel.activeSelf);
     }
     
 }
