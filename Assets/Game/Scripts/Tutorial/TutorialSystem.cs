@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using MocopiAIGame;
-using MocopiDistinction;
 using TMPro;
 using UniRx;
 using UnityEngine;
@@ -23,7 +22,9 @@ public class TutorialSystem : MonoBehaviour
     [Header("システム")]
     [SerializeField] private MotionDataInputer motionDataInputer;
     [SerializeField] private SendData sendData;
-    [SerializeField] private MocopiDistinctionAI mocopiDistinctionAI;
+
+    [SerializeField]
+    private TutorialVideoPlayer tutorialVideoPlayer;
     
     private EnemyController _enemyController;
     
@@ -62,7 +63,7 @@ public class TutorialSystem : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(5f));
         await ChangeTutorialText("敵の攻撃に合わせて反撃の動きをしよう！");
         await UniTask.Delay(TimeSpan.FromSeconds(4f));
-        PunchTutorial();
+        PunchTutorial().Forget();
     }
     
     private async UniTask PunchTutorial()
@@ -72,10 +73,11 @@ public class TutorialSystem : MonoBehaviour
         _enemyController.WalkAnimation();
         // チュートリアル用のパンチイベントを発行が発行されるまで待つ
         await _enemyController.OnPunch.First();
+        await tutorialVideoPlayer.PlayPunchVideo();
         //4がパンチのモーション番号
         await CountDown(4);
         _enemyController.DefaultPositionAndAnimation();
-        KickTutorial();
+        KickTutorial().Forget();
     }
 
     private async UniTask KickTutorial()
@@ -85,24 +87,26 @@ public class TutorialSystem : MonoBehaviour
         _enemyController.WalkAnimationTwo();
         // チュートリアル用のキックイベントを発行が発行されるまで待つ
         await _enemyController.OnTwoHandAttack.First();
+        await tutorialVideoPlayer.PlayKickVideo();
         //5がキックのモーション番号
         await CountDown(5);
         _enemyController.DefaultPositionAndAnimation();
-        HitTutorial();
+        HitTutorial().Forget();
     }
 
     private async UniTask HitTutorial()
     {
-        await ChangeTutorialText("敵がこの動きをしてきたら\nヒットで反撃しよう！");
+        await ChangeTutorialText("敵がこの動きをしてきたら\n打ち返す動きで反撃しよう！");
         //TODO: ここで0に合わせてkickをする旨、パンチの動画を再生する
         _enemyController.ThrowAnimation();
         // チュートリアル用のヒットイベントを発行が発行されるまで待つ
         await _enemyController.OnThrow.First();
+        await tutorialVideoPlayer.PlayHitVideo();
         //2がヒットのモーション番号
         await CountDown(2);
         FirePool.Instance.Clean();
         _enemyController.DefaultPositionAndAnimation();
-        PKFreezeTutorial();
+        PKFreezeTutorial().Forget();
     }
 
     private async UniTask PKFreezeTutorial()
@@ -111,18 +115,29 @@ public class TutorialSystem : MonoBehaviour
         _enemyController.JumpAnimation();
         // チュートリアル用のPKサンダーイベントを発行が発行されるまで待つ
         await _enemyController.OnJump.First();
+        await tutorialVideoPlayer.PlayPKThunderVideo();
         //1がPKサンダーのモーション番号
         await CountDown(1);
         _enemyController.DefaultPositionAndAnimation();
-        PKFireTutorial();
+        PKFireTutorial().Forget();
     }
     
     private async UniTask PKFireTutorial()
     {
         await ChangeTutorialText("敵が疲れていたら\n両手から炎を出して攻撃しよう！");
         _enemyController.TutorialStunAnimation();
+        await tutorialVideoPlayer.PlayPKFireVideo();
         // 0がPKファイヤのモーション番号
         await CountDown(0);
+        _enemyController.DefaultPositionAndAnimation();
+        NutoralTutorial().Forget();
+    }
+    
+    private async UniTask NutoralTutorial()
+    {
+        await ChangeTutorialText("最後に攻撃をしていない棒立ちの\n状態をAIに送信しよう！");
+        //3が何もしないのモーション番号
+        await CountDown(3);
         _enemyController.DefaultPositionAndAnimation();
         MakeAITime();
     }

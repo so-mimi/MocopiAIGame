@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class PlayerHP : MonoBehaviour
 {
     [SerializeField] private Slider slider = null;
-    private float maxHP = 100f;
-    private float currentHP = 100f;
+    public float maxHP = 100f;
+    public float currentHP = 100f;
 
     private void Start()
     {

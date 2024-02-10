@@ -39,9 +39,9 @@ public class ResetGame : MonoBehaviour
         endPanel.SetActive(true);
         startPanel.SetActive(false);
     }
-    
-    
-    private void ResetGameProcess()
+
+
+    public void ResetGameProcess()
     {
         sendData.SendResetCommand();
         motionDataInputer.filePath = "";

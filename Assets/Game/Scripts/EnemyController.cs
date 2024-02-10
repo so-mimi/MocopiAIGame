@@ -322,7 +322,7 @@ namespace MocopiAIGame
                 .Append(enemyMaterial.DOColor(Color.white, 0.1f))
                 .Append(enemyMaterial.DOColor(Color.black, 0.1f));
             await UniTask.Delay(10);
-            enemyHP.Damage(20f);
+            enemyHP.Damage(15f);
             audioSource.PlayOneShot(damageClip);
             TimeManager.Instance.ResetTime();
         }

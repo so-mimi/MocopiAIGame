@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     [SerializeField] private PlayerHP playerHP;
     private Transform cameraTransform = null;
     [SerializeField] private Transform fireSpawnPoint;
+    [SerializeField] private ResetGame resetGame;
 
 
     public void SpawnFreezeBall()
@@ -26,6 +27,13 @@ public class Player : MonoBehaviour
     public void PlayerDamageEffect()
     {
         viewOfDamage.PlayerDamageEffect();
-        playerHP.Damage(12f);
+        playerHP.Damage(15f);
+        if (playerHP.currentHP <= 0)
+        {
+            //死亡処理
+            resetGame.ResetGameProcess();
+            playerHP.currentHP = playerHP.maxHP;
+            playerHP.SetHP(playerHP.currentHP);
+        }
     }
 }

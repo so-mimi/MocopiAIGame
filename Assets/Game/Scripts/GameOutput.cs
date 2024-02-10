@@ -53,15 +53,15 @@ public class GameOutput : MonoBehaviour
             }
             if (i == 2)
             {
-                results[i] *= 0.8f;
+                results[i] *= 0.1f;
             }
             if (i == 4)
             {
-                results[i] *= 80f;
+                results[i] *= 1000f;
             }
             if (i == 5)
             {
-                results[i] *= 0.3f;
+                results[i] *= 3f;
             }
             
             if (max < results[i])
