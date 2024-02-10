@@ -136,6 +136,7 @@ public class TutorialSystem : MonoBehaviour
     private async UniTask NutoralTutorial()
     {
         await ChangeTutorialText("最後に攻撃をしていない棒立ちの\n状態をAIに送信しよう！");
+        await UniTask.Delay(TimeSpan.FromSeconds(3f));
         //3が何もしないのモーション番号
         await CountDown(3);
         _enemyController.DefaultPositionAndAnimation();
